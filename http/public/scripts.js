@@ -2,8 +2,27 @@ const ul = document.querySelector("ul")
 const input = document.querySelector("input")
 const form = document.querySelector('form')
 
+async function load(){
+    const res = await fetch("http://localhost:3000/").then(data => data.json());
+    
+    res.urls.map(({name,url}) => addElement({name,url}))
+}
+
+async function save(name,url){
+    await fetch(`http://localhost:3000/?name=${name}&url=${url}`).then(data => data.json());
+}
+
+async function remove(name,url,index){
+    await fetch(`http://localhost:3000/?name=${name}&url=${url}&del=${index}`).then(data => data.json());
+}
+
+
+load();
+
 
 function addElement({ name, url }) {
+  
+
     const li = document.createElement('li')
     const a = document.createElement("a")
     const trash = document.createElement("span")
@@ -22,7 +41,11 @@ function addElement({ name, url }) {
 
 function removeElement(el) {
     if (confirm('Tem certeza que deseja deletar?'))
+    
         el.parentNode.remove()
+
+        const{text,origin} = el.parentNode.firstChild;
+        remove(text,origin,1)
 }
 
 form.addEventListener("submit", (event) => {
@@ -43,5 +66,8 @@ form.addEventListener("submit", (event) => {
 
     addElement({ name, url })
 
+    save(name,url)
+
     input.value = ""
 })
+
